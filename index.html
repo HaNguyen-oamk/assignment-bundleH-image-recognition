@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Recognition Tool</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        text-align: center;
+      }
+      input[type="file"] {
+        margin: 20px;
+      }
+      img {
+        max-width: 300px;
+        margin-top: 20px;
+        border: 1px solid #ccc;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Image Recognition Tool</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+      <input type="file" name="image" accept="image/*" required />
+      <button type="submit">Upload Image</button>
+    </form>
+    <div id="image-upload"></div>
+    <div id="result"></div>
+
+    <script>
+      document.getElementById("upload-form").onsubmit = async function (event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        const response = await fetch("/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          document.getElementById("result").innerText = `Error: ${errorText}`;
+          return;
+        }
+
+        const result = await response.json();
+        document.getElementById("result").innerText = JSON.stringify(
+          result,
+          null,
+          2
+        );
+
+        const uploadedFile =
+          document.querySelector('input[type="file"]').files[0];
+        const imageUrl = URL.createObjectURL(uploadedFile);
+        const img = document.createElement("img");
+        img.src = imageUrl;
+        img.alt = "Uploaded Image";
+        document.getElementById("image-upload").innerHTML = "";
+        document.getElementById("image-upload").appendChild(img);
+      };
+    </script>
+  </body>
+</html>
